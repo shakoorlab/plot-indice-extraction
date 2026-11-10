@@ -1,0 +1,13 @@
+.DS_Store
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+*.tif
+*.tiff
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.csv
+*.xlsx
