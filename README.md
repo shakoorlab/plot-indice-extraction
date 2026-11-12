@@ -32,7 +32,7 @@ Supplemental/
 | Notebook | Input | Output |
 |---|---|---|
 | Template RGB | 1 RGB `.tif` and 1 `.shp` | 1 CSV, 3 band means and 25 indices |
-| Template MS | 1 MS `.tif` and 1 `.shp` | 1 CSV, 4 band means and 46 indices |
+| Template MS | 1 MS `.tif` and 1 `.shp` | 1 CSV, 4 band means and 44 indices |
 | Batch RGB | 1 site folder | 1 CSV for each date and 1 summary CSV |
 | Batch MS | 1 site folder | 1 CSV for each date and 1 summary CSV |
 | 1 Merge dates | the date CSVs for 1 site | 1 site master CSV |
@@ -79,7 +79,7 @@ If your raster has a different band order, the indices will be wrong. Check the 
 The MS orthomosaics must contain reflectance values (0 to 1). Before you run a notebook, check the band value range of one file (for example, in QGIS).
 
 - If the values are between 0 and 1 (reflectance), use the notebooks as they are.
-- If the values are much larger (for example 0 to 65535, raw pixel values), convert the bands to reflectance before you calculate the indices. If you cannot convert them, do not use the indices that add a fixed constant: SAVI, MSAVI, OSAVI, OSAVI_2, TSAVI, PVI, SAVI_2, ATSAVI, EVI_2, MEVI, MCARI_2, MTVI_2, R_MCARI_MTVI_2, R_TCARI_OSAVI, MCARI_OSAVI and TCARI_OSAVI. Their constants (for example 0.5, 0.16 or 1.0) assume reflectance, so with raw values their results have no meaning.
+- If the values are much larger (for example 0 to 65535, raw pixel values), convert the bands to reflectance before you calculate the indices. If you cannot convert them, do not use the indices that add a fixed constant: SAVI, MSAVI, OSAVI, OSAVI_2, TSAVI, PVI, SAVI_2, ATSAVI, MEVI, MCARI_2, R_MCARI_MTVI_2, R_TCARI_OSAVI, MCARI_OSAVI and TCARI_OSAVI. Their constants (for example 0.5, 0.16 or 1.0) assume reflectance, so with raw values their results have no meaning.
 
 Normalized difference and ratio indices (for example NDVI, gNDVI, NDRE and RVI_1) do not change with the value scale.
 
@@ -193,9 +193,9 @@ If the calculation fails for one plot, the batch notebook writes `NaN` for that 
 </details>
 
 <details>
-<summary>MS: 4 band means and 46 indices</summary>
+<summary>MS: 4 band means and 44 indices</summary>
 
-`Mean Green`, `Mean Red`, `Mean RedEdge`, `Mean NIR`, `NDVI`, `gNDVI`, `RVI_1`, `GCI`, `RGVI`, `DVI`, `SAVI`, `MSAVI`, `OSAVI`, `RDVI`, `TVI`, `TSAVI`, `PVI`, `SAVI_2`, `ATSAVI`, `NDWI`, `RVI_2`, `MCARI`, `MCARI_1`, `MCARI_2`, `MTVI_1`, `MTVI_2`, `R_MCARI_MTVI_2`, `DATT`, `NDCI`, `PSRI`, `PSRI2`, `PSRI3`, `SPVI`, `TCARI`, `R_TCARI_OSAVI`, `RERI`, `NDRE`, `MTCI`, `EVI_2`, `RECI`, `NGRDI`, `ARI_2`, `CRI_2`, `NRVI`, `OSAVI_2`, `MEVI`, `TVI_2`, `MCARI_OSAVI`, `TCARI_OSAVI`, `WDRVI`
+`Mean Green`, `Mean Red`, `Mean RedEdge`, `Mean NIR`, `NDVI`, `gNDVI`, `RVI_1`, `GCI`, `RGVI`, `DVI`, `SAVI`, `MSAVI`, `OSAVI`, `RDVI`, `TVI`, `TSAVI`, `PVI`, `SAVI_2`, `ATSAVI`, `NDWI`, `RVI_2`, `MCARI`, `MCARI_1`, `MCARI_2`, `MTVI_1`, `R_MCARI_MTVI_2`, `DATT`, `NDCI`, `PSRI`, `PSRI2`, `PSRI3`, `SPVI`, `TCARI`, `R_TCARI_OSAVI`, `RERI`, `NDRE`, `MTCI`, `MEVI`, `RECI`, `NGRDI`, `ARI_2`, `CRI_2`, `NRVI`, `OSAVI_2`, `TVI_2`, `MCARI_OSAVI`, `TCARI_OSAVI`, `WDRVI`
 
 </details>
 
@@ -279,6 +279,23 @@ For each plot polygon, all notebooks do these steps:
 The indices come from the plot-mean band values. They are not the mean of index values calculated for each pixel. For non-linear indices, these two methods can give different results.
 
 **Known limitation:** with `filled=True, nodata=0`, pixels inside the plot bounding box but outside the polygon get the value 0. The mean includes these zeros. For plots that align with the raster grid, the effect is small. For rotated plots, the band means are lower than the true plot mean. All notebooks use the same method, so their outputs agree with each other.
+
+### Formula updates (November 2026)
+
+The MS formulas below were changed to match the published definitions. MS CSVs made before this update have different values in these columns.
+
+| Index | Change | Reference |
+|---|---|---|
+| NDCI | Uses Red instead of Green: (RE − R) / (RE + R) | Mishra & Mishra, 2012 |
+| SPVI | Brackets corrected: 0.4 · [3.7 (N − R) − 1.2 · \|G − R\|] | Vincini et al., 2006 |
+| SAVI_2 | Sign corrected: N / (R + b/a) | Major et al., 1990 |
+| ATSAVI | NIR added to the numerator | Baret & Guyot, 1991 |
+| MCARI_2 | Divides by √((2N + 1)² − (6N − 5√R) − 0.5) | Haboudane et al., 2004 |
+| R_MCARI_MTVI_2 | Calculated as MCARI / MTVI2 with the corrected MTVI2 | Eitel et al., 2007 |
+| MEVI | The two-band EVI (EVI2). Replaces the duplicate column EVI_2 | Jiang et al., 2008 |
+| MTVI_2 | Removed as a column. After the correction it has the same value as MCARI_2 | Haboudane et al., 2004 |
+
+N = NIR, R = Red, G = Green, RE = RedEdge. The MS output now has 4 band means and 44 indices.
 
 ### Differences between the template and batch notebooks
 
