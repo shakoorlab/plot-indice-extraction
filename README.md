@@ -280,22 +280,98 @@ The indices come from the plot-mean band values. They are not the mean of index 
 
 **Known limitation:** with `filled=True, nodata=0`, pixels inside the plot bounding box but outside the polygon get the value 0. The mean includes these zeros. For plots that align with the raster grid, the effect is small. For rotated plots, the band means are lower than the true plot mean. All notebooks use the same method, so their outputs agree with each other.
 
-### Formula updates (November 2026)
+### Formulas
 
-The MS formulas below were changed to match the published definitions. MS CSVs made before this update have different values in these columns.
+All indices are calculated from the plot-mean band values. R, G, B, N and RE are the mean Red, Green, Blue, NIR and RedEdge values of the plot. RGB formulas use 8-bit values (0–255). The formulas below are the ones used in the notebooks.
 
-| Index | Change | Reference |
+<details>
+<summary>RGB formulas (3 band means, 25 indices)</summary>
+
+| Index | Formula | Reference |
 |---|---|---|
-| NDCI | Uses Red instead of Green: (RE − R) / (RE + R) | Mishra & Mishra, 2012 |
-| SPVI | Brackets corrected: 0.4 · [3.7 (N − R) − 1.2 · \|G − R\|] | Vincini et al., 2006 |
-| SAVI_2 | Sign corrected: N / (R + b/a) | Major et al., 1990 |
-| ATSAVI | NIR added to the numerator | Baret & Guyot, 1991 |
-| MCARI_2 | Divides by √((2N + 1)² − (6N − 5√R) − 0.5) | Haboudane et al., 2004 |
-| R_MCARI_MTVI_2 | Calculated as MCARI / MTVI2 with the corrected MTVI2 | Eitel et al., 2007 |
-| MEVI | The two-band EVI (EVI2). Replaces the duplicate column EVI_2 | Jiang et al., 2008 |
-| MTVI_2 | Removed as a column. After the correction it has the same value as MCARI_2 | Haboudane et al., 2004 |
+| Mean Red / Green / Blue | mean of the band inside the plot | — |
+| RCC | R / (R + G + B) | Gillespie et al., 1987 |
+| GCC | G / (R + G + B) | Gillespie et al., 1987 |
+| ExR | (1.4R − G) / (R + G + B) | Meyer et al., 1999 |
+| ExG | (2G − R − B) / (R + G + B) | Woebbecke et al., 1995 |
+| ExGR | ExG − ExR | Meyer & Neto, 2008 |
+| VARI_2 | (G − R) / (G + R − B) | Gitelson et al., 2002 |
+| MGRVI | (G² − R²) / (G² + R²) | Bendig et al., 2015 |
+| CIVE | 0.441R − 0.881G + 0.385B + 18.787 | Kataoka et al., 2003 (published G coefficient is 0.811) |
+| VEG | G / (R^0.667 · B^0.334) | Hague et al., 2006 |
+| RGVI | R / G | Saberioon et al., 2014 |
+| NPCI | (R − B) / (R + B) | Peñuelas et al., 1994 (RGB form of 680/430 nm) |
+| SRPI | B / R | Peñuelas et al., 1994 (RGB form of 430/680 nm) |
+| NGRDI | (G − R) / (G + R) | Tucker, 1979 |
+| SCI | (R − G) / (R + G) | Mathieu et al., 1998 |
+| GLI | (2G − R − B) / (2G + R + B) | Louhaichi et al., 2001 |
+| HI | (2R − G − B) / (G − B) | Escadafal et al., 1994 |
+| VARI | (G − R) / (G + R + B) | Variant of Gitelson et al., 2002 (published VARI is VARI_2) |
+| GLAI | 25 · (G − R) / (G + R − B) + 1.25 | Listed in uavRst `rgb_indices` |
+| CI | (R − B) / R | IndexDatabase (Coloration index) |
+| SHP | 2 · (R − G − B) / (G − B) | IndexDatabase (Shape index) |
+| SAT | (max(R,G,B) − min(R,G,B)) / max(R,G,B) | IndexDatabase (Saturation index) |
+| HUE | atan(2 · (R − G − B) / 30.5 · (G − B)) | Escadafal et al., 1994 |
+| RI | R² / (B · G³) | Madeira et al., 1997; Mathieu et al., 1998 |
+| BI | √((R² + G² + B²) / 3) | Mathieu et al., 1998 |
+| VVI | [1 − (R − 30)/(R + 30)] · [1 − (G − 50)/(G + 50)] · [1 − (B − 1)/(B + 1)] | Planetary Habitability Laboratory, 2015 |
 
-N = NIR, R = Red, G = Green, RE = RedEdge. The MS output now has 4 band means and 44 indices.
+</details>
+
+<details>
+<summary>MS formulas (4 band means, 44 indices)</summary>
+
+Constants: L = 0.5 (SAVI), a = 0.96916 and b = 0.084726 (soil line), X = 0.08 (ATSAVI).
+
+| Index | Formula | Reference |
+|---|---|---|
+| Mean Green / Red / RedEdge / NIR | mean of the band inside the plot | — |
+| NDVI | (N − R) / (N + R) | Rouse et al., 1974 |
+| gNDVI | (N − G) / (N + G) | Gitelson et al., 1996 |
+| RVI_1 | N / R | Jordan, 1969 |
+| GCI | N / G − 1 | Gitelson et al., 2003 |
+| RGVI | R / G | Saberioon et al., 2014 |
+| DVI | N − R | Roujean & Bréon, 1995 |
+| SAVI | (1 + L) · (N − R) / (N + R + L) | Huete, 1988 |
+| MSAVI | 0.5 · [2N + 1 − √((2N + 1)² − 8(N − R))] | Qi et al., 1994 |
+| OSAVI | (N − R) / (N + R + 0.16) | Rondeaux et al., 1996 |
+| RDVI | √((N − R)² / (N + R)) | Roujean & Bréon, 1995 |
+| TVI | 60(N − G) − 100(R − G) | Broge & Leblanc, 2001 |
+| TSAVI | a(N − aR − b) / (aN + R − ab) | Baret et al., 1989 |
+| PVI | (N − aR − b) / √(1 + a²) | Richardson & Wiegand, 1977 |
+| SAVI_2 | N / (R + b/a) | Major et al., 1990 |
+| ATSAVI | a(N − aR − b) / (aN + R − ab + X(1 + a²)) | Baret & Guyot, 1991 |
+| NDWI | (G − N) / (G + N) | McFeeters, 1996 |
+| RVI_2 | N / G | Buschmann & Nagel, 1993 |
+| MCARI | [(RE − R) − 0.2(RE − G)] · (RE / R) | Daughtry et al., 2000 |
+| MCARI_1 | 1.2 · [2.5(N − R) − 1.3(N − G)] | Haboudane et al., 2004 |
+| MCARI_2 | 1.5 · [2.5(N − R) − 1.3(N − G)] / √((2N + 1)² − (6N − 5√R) − 0.5) | Haboudane et al., 2004 |
+| MTVI_1 | 1.2 · [1.2(N − G) − 2.5(R − G)] | Haboudane et al., 2004 |
+| R_MCARI_MTVI_2 | MCARI / MTVI2, where MTVI2 = 1.5 · [1.2(N − G) − 2.5(R − G)] / √((2N + 1)² − (6N − 5√R) − 0.5) | Eitel et al., 2007 |
+| DATT | (N − RE) / (N − R) | Datt, 1999 |
+| NDCI | (RE − R) / (RE + R) | Mishra & Mishra, 2012 |
+| PSRI | (R − G) / RE | Merzlyak et al., 1999 (published form: (R680 − R500) / R750) |
+| PSRI2 | (R − G) / N | Lab-defined (Shakoor Lab) |
+| PSRI3 | (RE − R) / N | Lab-defined (Shakoor Lab) |
+| SPVI | 0.4 · [3.7(N − R) − 1.2 · \|G − R\|] | Vincini et al., 2006 |
+| TCARI | 3 · [(RE − R) − 0.2(RE − G) · (RE / R)] | Haboudane et al., 2002 |
+| R_TCARI_OSAVI | TCARI / [(N − R) / (N + R + 0.16)] | Haboudane et al., 2002 (OSAVI without the 1.16 factor) |
+| RERI | (RE − R) / N | Zhang et al., 2010 |
+| NDRE | (N − RE) / (N + RE) | Gitelson & Merzlyak, 1994 |
+| MTCI | (N − RE) / (RE − R) | Dash & Curran, 2004 (published form uses two red-edge bands) |
+| MEVI | 2.5 · (N − R) / (N + 2.4R + 1) | Jiang et al., 2008 (two-band EVI, EVI2) |
+| RECI | N / RE − 1 | Gitelson et al., 2003 |
+| NGRDI | (G − R) / (G + R) | Tucker, 1979 |
+| ARI_2 | N · (1/G − 1/RE) | Gitelson et al., 2001 |
+| CRI_2 | 1/G − 1/RE | Gitelson et al., 2002 (published form uses 510 nm) |
+| NRVI | (1/RVI − 1) / (1/RVI + 1), with RVI = N / R | Baret & Guyot, 1991 |
+| OSAVI_2 | 1.16 · (N − R) / (N + R + 0.16) | Rondeaux et al., 1996 |
+| TVI_2 | √(NDVI + 0.5) | Rouse et al., 1974 |
+| MCARI_OSAVI | MCARI / OSAVI_2 | Daughtry et al., 2000 |
+| TCARI_OSAVI | TCARI / OSAVI_2 | Haboudane et al., 2002 |
+| WDRVI | (0.12N − R) / (0.12N + R) | Gitelson, 2004 |
+
+</details>
 
 ### Differences between the template and batch notebooks
 
