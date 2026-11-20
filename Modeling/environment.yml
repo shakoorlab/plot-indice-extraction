@@ -1,0 +1,23 @@
+# Conda environment for the Modeling scripts (same packages as the lab "yam-fcover" env).
+#   conda env create -f environment.yml
+#   conda activate yam-fcover
+name: yam-fcover
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy
+  - pandas
+  - openpyxl            # pandas.read_excel for the master Site/Date workbook
+  - pillow
+  - scipy
+  - scikit-image        # watershed
+  - shapely>=2
+  - geopandas
+  - rasterio
+  - pip
+  - pip:
+      - torch
+      - segmentation-models-pytorch
+      - albumentations
+      - label-studio-converter   # only needed for Train/1_build_training_data.py

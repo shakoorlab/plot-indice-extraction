@@ -1,0 +1,25 @@
+5-FOLD CROSS-VALIDATION RESULTS - HOW TO READ THEM
+==================================================
+
+Plots: 104   Folds: 5   Epochs/fold: 150   Input: 128px letterboxed, ImageNet-normalized
+
+WHAT THESE NUMBERS ARE
+  These are OUT-OF-FOLD estimates: each plot was scored by a model that never
+  saw it in training. The 104 predictions come from 5 different models. The
+  numbers estimate how well the TRAINING PROCEDURE generalizes -- they are NOT
+  the measured accuracy of any single saved model.
+
+  unet_canopy_full.pt (trained on all 104 plots) is the model you deploy for
+  prediction. Its true accuracy is ESTIMATED by this CV, not measured directly.
+
+HEADLINE (mean over 104 plots; trust mean +/- std, not any one fold at n=104)
+  Segmentation   : IoU 0.669 +/- 0.196   Dice 0.784 +/- 0.155
+  Fcover (canopy%): MAE 5.74 pts   RMSE 7.99   bias +2.55   R2 0.919
+  (bias > 0 means the model over-predicts canopy cover on average.)
+
+CAVEATS
+  * n=104 is small: fold-to-fold variance is expected and is not model failure.
+  * Sparse-canopy plots are the hardest. Check them in val_report_cv.csv.
+  * Treat this as a pipeline sanity check. Re-run after each annotation batch
+    and watch MAE trend down / R2 up.
+  * See loss_curves/ to judge whether EPOCHS is sensible before scaling up.
